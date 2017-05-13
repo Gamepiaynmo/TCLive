@@ -12,6 +12,14 @@ Baidu Tieba Live Mod for Minecraft
 
 [Link](https://tieba.baidu.com/p/5114045077)
 
+## Note
+
+- Java 1.8 required
+
+## Supported Versions
+
+- Minecraft 1.11.2
+
 ## Friendly Links
 
 [TopologyCraft](https://tieba.baidu.com/f?ie=utf-8&kw=topologycraft)
