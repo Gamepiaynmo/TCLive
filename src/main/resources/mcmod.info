@@ -1,0 +1,16 @@
+[
+{
+  "modid": "tclive",
+  "name": "TCLive",
+  "description": "Baidu Tieba Live Mod.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Gamepiaynmo"],
+  "credits": "Topologycraft",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
