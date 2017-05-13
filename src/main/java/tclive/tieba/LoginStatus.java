@@ -11,6 +11,7 @@ import javax.crypto.Cipher;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -37,11 +38,14 @@ public class LoginStatus {
 	static String static_loginUrl = "https://passport.baidu.com/v2/api/?login";
 	static String static_codeUrl = "https://passport.baidu.com/cgi-bin/genimage?";
 	static String static_verifyUrl = "https://passport.baidu.com/v2/?checkvcode&token=%s&tpl=tb&apiver=v3&tt=%d&verifycode=%s&codestring=%s&callback=%s";
+	static String static_checkUrl = "https://passport.baidu.com/v2/api/?logincheck&token=%s&tpl=tb&apiver=v3&tt=%d&sub_source=leadsetpwd&username=%s&isphone=false&callback=%s";
 	
 	static String param_callback_token = Utils.genCallback(), param_callback_rsa = Utils.genCallback(), param_callback_login = Utils.genCallback();
 	static String param_gid = Utils.genGid();
 	static String param_token, param_codeString;
 	static String param_rsaKey, param_publicKey;
+	
+	static final String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36";
 	
 	private CloseableHttpClient httpClient;
 	private JsonParser jsonParser;
@@ -59,7 +63,7 @@ public class LoginStatus {
 		} catch (IOException e) {
 		}
 		TCLiveMod.mod.cookieStore.clear();
-		TCLiveMod.mod.httpClient = HttpClients.custom().setDefaultCookieStore(TCLiveMod.mod.cookieStore).build();
+		TCLiveMod.mod.httpClient = HttpClients.custom().setUserAgent(userAgent).setDefaultCookieStore(TCLiveMod.mod.cookieStore).build();
 		httpClient = TCLiveMod.mod.httpClient;
 	}
 	
@@ -73,6 +77,20 @@ public class LoginStatus {
 	
 	private boolean checkCanLogin() {
 		return !TCLiveMod.mod.tb_username.isEmpty() && !TCLiveMod.mod.tb_password.isEmpty();
+	}
+	
+	public String checkVerifyCode(String token) {
+		try {
+			HttpGet httpPost = new HttpGet(String.format(static_checkUrl, token, System.currentTimeMillis(), TCLiveMod.mod.tb_username, Utils.genCallback()));
+			CloseableHttpResponse response = httpClient.execute(httpPost);
+			String json = EntityUtils.toString(response.getEntity());
+			json = json.substring(json.indexOf("(") + 1, json.lastIndexOf(")"));
+			JsonObject checkJson = jsonParser.parse(json).getAsJsonObject();
+			response.close();
+			return checkJson.getAsJsonObject("data").get("codeString").getAsString();
+		} catch (Exception e) {
+			return "";
+		}
 	}
 	
 	public void tryLogin() {
@@ -89,7 +107,11 @@ public class LoginStatus {
 			tokenJson = tokenJson.substring(tokenJson.indexOf("(") + 1, tokenJson.lastIndexOf(")"));
 			JsonObject jsonObject = jsonParser.parse(tokenJson).getAsJsonObject().getAsJsonObject("data");
 			param_token = jsonObject.get("token").getAsString();
-			param_codeString = jsonObject.get("codeString").getAsString();
+			param_codeString = checkVerifyCode(param_token);
+			if (!param_codeString.isEmpty()) {
+				lastErrorCode = 257;
+				return;
+			}
 			String rsaUrl = String.format(static_rsaUrl, param_token, System.currentTimeMillis(), param_gid, param_callback_rsa);
 			response = httpClient.execute(new HttpGet(rsaUrl));
 			String rsaJson = EntityUtils.toString(response.getEntity());
@@ -167,20 +189,20 @@ public class LoginStatus {
 				lastErrorCode = -1;
 				return;
 			}
-			httpClient.execute(new HttpGet("http://tieba.baidu.com/")).close();
-			String tokenUrl = String.format(static_tokenUrl, System.currentTimeMillis(), param_gid, param_callback_token);
-			CloseableHttpResponse response = httpClient.execute(new HttpGet(tokenUrl));
-			String tokenJson = EntityUtils.toString(response.getEntity());
-			response.close();
-			tokenJson = tokenJson.substring(tokenJson.indexOf("(") + 1, tokenJson.lastIndexOf(")"));
-			JsonObject jsonObject = jsonParser.parse(tokenJson).getAsJsonObject().getAsJsonObject("data");
-			param_token = jsonObject.get("token").getAsString();
+//			httpClient.execute(new HttpGet("http://tieba.baidu.com/")).close();
+//			String tokenUrl = String.format(static_tokenUrl, System.currentTimeMillis(), param_gid, param_callback_token);
+//			CloseableHttpResponse response = httpClient.execute(new HttpGet(tokenUrl));
+//			String tokenJson = EntityUtils.toString(response.getEntity());
+//			response.close();
+//			tokenJson = tokenJson.substring(tokenJson.indexOf("(") + 1, tokenJson.lastIndexOf(")"));
+//			JsonObject jsonObject = jsonParser.parse(tokenJson).getAsJsonObject().getAsJsonObject("data");
+//			param_token = jsonObject.get("token").getAsString();
 			String rsaUrl = String.format(static_rsaUrl, param_token, System.currentTimeMillis(), param_gid, param_callback_rsa);
-			response = httpClient.execute(new HttpGet(rsaUrl));
+			CloseableHttpResponse response = httpClient.execute(new HttpGet(rsaUrl));
 			String rsaJson = EntityUtils.toString(response.getEntity());
 			response.close();
 			rsaJson = rsaJson.substring(rsaJson.indexOf("(") + 1, rsaJson.lastIndexOf(")"));
-			jsonObject = jsonParser.parse(rsaJson).getAsJsonObject();
+			JsonObject jsonObject = jsonParser.parse(rsaJson).getAsJsonObject();
 			param_rsaKey = jsonObject.get("key").getAsString();
 			param_publicKey = jsonObject.get("pubkey").getAsString();
 			param_publicKey = param_publicKey.substring(param_publicKey.indexOf("\n") + 1, param_publicKey.indexOf("-----END PUBLIC KEY-----") - 1);

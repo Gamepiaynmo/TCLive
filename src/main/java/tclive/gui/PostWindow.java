@@ -135,7 +135,7 @@ public class PostWindow extends GuiScreen {
 	
 	private String replaceSymbols(String text) {
 		try {
-			text = text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("  ", "¡¡").replaceAll("\\\\n", "[br]");
+			text = text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("  ", "&ensp;&ensp;").replaceAll("\\\\n", "[br]");
 			return URLEncoder.encode(text, "utf-8");
 		} catch (Exception e) {
 			return text;
@@ -216,14 +216,14 @@ public class PostWindow extends GuiScreen {
 
 		@Override
 		protected void elementClicked(int slotIndex, int button, int mouseX, int mouseY) {
-			int index = entries[slotIndex].texIndex;
-			PostWindow.postWindow.textList.writeText("@[pic" + index + "]@");
+			PostWindow.postWindow.textList.writeText("@[pic" + slotIndex + "]@");
 		}
 		
 		public void onInit() {
-			File[] files = new File("./screenshots").listFiles();
-			for (int i = files.length - 1; i >= 0; i--)
-				picList.add(files[i]);
+			File[] files = new File(TCLiveMod.mc.mcDataDir, "screenshots").listFiles();
+			if (files != null)
+				for (int i = files.length - 1; i >= 0; i--)
+					picList.add(files[i]);
 			for (int i = 0; i < 4; i++) {
 				entries[i] = new ListThumbnailSelectionEntry(getPicFile(i), i);
 			}

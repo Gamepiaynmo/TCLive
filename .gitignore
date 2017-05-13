@@ -1,0 +1,28 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+lib
+libs
+src/main/java/net
+gradle
+forge-1.11.2-13.20.0.2228-changelog.txt
+README.txt

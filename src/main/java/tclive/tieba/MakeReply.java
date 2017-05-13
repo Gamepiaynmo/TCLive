@@ -98,7 +98,7 @@ public class MakeReply {
 	public String getEmotionString(int index) {
 		try {
 			if (index > 0 && index <= 50)
-				return URLEncoder.encode(String.format("[emotion+pic_type=1+width=30+height=30]//tb2.bdstatic.com/tb/editor/images/face/i_f%2d.png?t=20140803[/emotion]", index), "utf-8").replaceAll("%2B", "+");
+				return URLEncoder.encode(String.format("[emotion+pic_type=1+width=30+height=30]//tb2.bdstatic.com/tb/editor/images/face/i_f%02d.png?t=20140803[/emotion]", index), "utf-8").replaceAll("%2B", "+");
 			else return String.format("@[emo%02d]@", index);
 		} catch (UnsupportedEncodingException e) {
 			return String.format("@[emo%02d]@", index);
