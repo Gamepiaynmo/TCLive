@@ -15,6 +15,7 @@ Baidu Tieba Live Mod for Minecraft
 ## Note
 
 - Java 1.8 required
+- Try the new login method !
 
 ## Supported Versions
 
