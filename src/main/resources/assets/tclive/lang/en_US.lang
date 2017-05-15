@@ -7,6 +7,8 @@ live.config.livetid=Live Post ID
 live.config.livetid.tooltip=LivePost ID
 live.config.tail=Tail
 live.config.tail.tooltip=Tail
+live.config.newlogin=New Login Method
+live.config.newlogin.tooltip=Old method will be faster, but sometimes fails. New method has higher change to succeed.
 
 live.key.category=Live Keys
 live.key.post=Post Window
@@ -61,7 +63,9 @@ live.failreason.804=Image Width Error
 live.failreason.805=Image Height Error
 live.failreason.809=Too Many Images
 live.failreason.814=Too Many Emotions
-live.failreason.unknown=Unknown Error
+live.failreason.400010=Invalid Username
+live.failreason.400011=Wrong Password
+live.failreason.unknown=Unknown Error, error code: %d
 
 live.gui.vericode=Input Verify Code
 live.gui.wrongcode=Wrong Verify Code

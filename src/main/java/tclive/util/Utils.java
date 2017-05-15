@@ -1,10 +1,12 @@
 package tclive.util;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyFactory;
@@ -16,6 +18,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import com.google.common.collect.Lists;
 
@@ -40,6 +46,21 @@ public class Utils {
 
 	public static String genCallback() {
 		return "bd__cbs__" + Integer.toString((int) Math.floor(2147483648L * rand.nextDouble()), 36);
+	}
+	
+	public static String launchRequest(CloseableHttpClient httpClient, HttpUriRequest request) {
+		try {
+			CloseableHttpResponse response = httpClient.execute(request);
+			String text = EntityUtils.toString(response.getEntity());
+			response.close();
+			return text;
+		} catch (Exception e) {
+			return "";
+		}
+	}
+	
+	public static String removeCallback(String text) {
+		return text.substring(text.indexOf("(") + 1, text.lastIndexOf(")"));
 	}
 
 	public static PublicKey getPublicKey(String key) throws Exception {
@@ -82,6 +103,21 @@ public class Utils {
 	public static String[] patternSplit(String text, String pattern) {
 		Pattern localPattern = Pattern.compile(pattern);
 		return localPattern.split(text);
+	}
+	
+	public static String readFile(InputStream is) throws IOException {
+		String line;
+		StringBuffer buffer = new StringBuffer();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		line = reader.readLine();
+		while (line != null) {
+			buffer.append(line);
+			buffer.append("\n");
+			line = reader.readLine();
+		}
+		reader.close();
+		is.close();
+		return buffer.toString();
 	}
 	
 	public static void downLoadFromUrl(String urlStr, String fileName, String savePath) throws IOException {
@@ -129,6 +165,14 @@ public class Utils {
 			TCLiveMod.mod.loginStatus.loadVerifyCodePicture();
 			TCLiveMod.mc.displayGuiScreen(new InputVerifyCode(false));
 			return;
+		case 500001:
+			TCLiveMod.mod.loginStatus.loadVerifyCodePicture();
+			TCLiveMod.mc.displayGuiScreen(new InputVerifyCode(true));
+			return;
+		case 500002:
+			TCLiveMod.mod.loginStatus.loadVerifyCodePicture();
+			TCLiveMod.mc.displayGuiScreen(new InputVerifyCode(false));
+			return;
 		default: sendMessageTranslate(getLoginFailReason(code)); return;
 		}
 	}
@@ -142,12 +186,12 @@ public class Utils {
 	
 	public static String getLoginFailReason(int reason) {
 		String key = "live.failreason." + reason;
-		return I18n.format("live.loginfailed") + " : " + (I18n.hasKey(key) ? I18n.format(key) : I18n.format("live.failreason.unknown"));
+		return I18n.format("live.loginfailed") + " : " + (I18n.hasKey(key) ? I18n.format(key) : I18n.format("live.failreason.unknown", reason));
 	}
 	
 	public static String getPostFailReason(int reason) {
 		String key = "live.failreason." + reason;
-		return I18n.format("live.postfailed") + " : " + (I18n.hasKey(key) ? I18n.format(key) : I18n.format("live.failreason.unknown"));
+		return I18n.format("live.postfailed") + " : " + (I18n.hasKey(key) ? I18n.format(key) : I18n.format("live.failreason.unknown", reason));
 	}
 	
 	public static void sendMessage(String text) {

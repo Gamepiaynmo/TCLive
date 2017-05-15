@@ -38,6 +38,7 @@ import tclive.gui.InputVerifyCode;
 import tclive.gui.PostWindow;
 import tclive.gui.VerifyCodePicture;
 import tclive.tieba.LoginStatus;
+import tclive.tieba.LoginStatusOld;
 import tclive.util.Utils;
 
 @Mod(modid = TCLiveMod.MODID, name = "Dim", version = TCLiveMod.VERSION, guiFactory = "tclive.gui.LiveConfig")
@@ -54,10 +55,11 @@ public class TCLiveMod {
 	
 	public Configuration config;
 	
-	public String tb_username;
-	public String tb_password;
-	public String tb_livetid;
-	public String tb_tail;
+	public String tb_username = "";
+	public String tb_password = "";
+	public String tb_livetid = "";
+	public String tb_tail = "";
+	public boolean tb_newlogin;
 	
 	public static final KeyBinding tb_post = new KeyBinding("live.key.post", KeyConflictContext.IN_GAME, Keyboard.KEY_F6, "live.key.category");
 
@@ -65,18 +67,18 @@ public class TCLiveMod {
 	public CloseableHttpClient httpClient;
 	public JsonParser jsonParser = new JsonParser();
 	
-	public LoginStatus loginStatus;
+	public LoginStatusOld loginStatus;
 	public VerifyCodePicture verifyCodePicture;
 	
 	public TCLiveMod() {
 		mod = this;
 		mc = Minecraft.getMinecraft();
-		loginStatus = new LoginStatus();
 	}
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		config = new Configuration(event.getSuggestedConfigurationFile());
+		loginStatus = new LoginStatus();
 		loadConfig(config);
 	}
 	
@@ -98,12 +100,22 @@ public class TCLiveMod {
 	}
 	
 	public void updateConfig(Configuration config) {
-		tb_username = config.getString("username", "live", "", "", "live.config.username");
-		tb_password = config.getString("password", "live", "", "", "live.config.password");
+		String new_username = config.getString("username", "live", "", "", "live.config.username");
+		String new_password = config.getString("password", "live", "", "", "live.config.password");
 		tb_livetid = config.getString("livetid", "live", "", "", "live.config.livetid");
 		tb_tail = config.getString("tail", "live", "\\n\\n\\n\\n                                        ---- From TCLive", "", "live.config.tail");
-		loginStatus.resetStatus();
-		config.save();
+		boolean new_newlogin = config.getBoolean("newlogin", "live", false, "", "live.config.newlogin");
+		if (new_newlogin != tb_newlogin) {
+			tb_newlogin = new_newlogin;
+			loginStatus = tb_newlogin ? new LoginStatus() : new LoginStatusOld();
+			config.save();
+		}
+		if (!tb_username.equals(new_username) || !tb_password.equals(new_password)) {
+			tb_username = new_username;
+			tb_password = new_password;
+			loginStatus.resetStatus();
+			config.save();
+		}
 	}
 	
 	@SubscribeEvent
