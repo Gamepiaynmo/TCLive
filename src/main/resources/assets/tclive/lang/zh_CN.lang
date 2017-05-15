@@ -67,6 +67,7 @@ live.failreason.814=表情过多
 live.failreason.400010=用户名不存在
 live.failreason.400011=密码错误
 live.failreason.unknown=未知错误，错误代码：%d
+live.failreason.needverify=需要安全验证：
 
 live.gui.vericode=输入验证码
 live.gui.wrongcode=验证码错误

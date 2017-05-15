@@ -67,6 +67,7 @@ live.failreason.814=Too Many Emotions
 live.failreason.400010=Invalid Username
 live.failreason.400011=Wrong Password
 live.failreason.unknown=Unknown Error, error code: %d
+live.failreason.needverify=Need Security Verification: 
 
 live.gui.vericode=Input Verify Code
 live.gui.wrongcode=Wrong Verify Code

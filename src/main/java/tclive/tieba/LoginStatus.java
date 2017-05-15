@@ -108,11 +108,14 @@ public class LoginStatus extends LoginStatusOld {
 			paramList.add(new BasicNameValuePair("callback", "parent." + Utils.genCallback()));
 			httpPost.setEntity(new UrlEncodedFormEntity(paramList, "utf-8"));
 			String response = Utils.launchRequest(httpClient, httpPost);
-			param_codeString = Utils.patternMatch(response, "&codeString=(\\w+)&");
+			param_codeString = Utils.patternMatch(response, "&codeString=([\\w]*)&");
+			String param_gotoUrl = Utils.patternMatch(response, "&gotoUrl=([^\"]*)\"");
 			lastErrorCode = Integer.parseInt(Utils.patternMatch(response, "err_no=(\\d+)"));
+			if (Utils.needSecurityVerify(lastErrorCode))
+				Utils.handleSecurityVerify(param_gotoUrl);
 			checkSuccess();
 			if (lastErrorCode == 0) hasLogined = true;
-			else if (!param_codeString.isEmpty())
+			else if (param_codeString != null && !param_codeString.isEmpty())
 				lastErrorCode = 500001;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -167,11 +170,14 @@ public class LoginStatus extends LoginStatusOld {
 			paramList.add(new BasicNameValuePair("vcodestr", param_codeString));
 			httpPost.setEntity(new UrlEncodedFormEntity(paramList, "utf-8"));
 			String response = Utils.launchRequest(httpClient, httpPost);
-			param_codeString = Utils.patternMatch(response, "&codeString=(\\w+)&");
+			param_codeString = Utils.patternMatch(response, "&codeString=([\\w]*)&");
+			String param_gotoUrl = Utils.patternMatch(response, "&gotoUrl=([^\"]*)\"");
 			lastErrorCode = Integer.parseInt(Utils.patternMatch(response, "err_no=(\\d+)"));
+			if (Utils.needSecurityVerify(lastErrorCode))
+				Utils.handleSecurityVerify(param_gotoUrl);
 			checkSuccess();
 			if (lastErrorCode == 0) hasLogined = true;
-			else if (!param_codeString.isEmpty())
+			else if (param_codeString != null && !param_codeString.isEmpty())
 				lastErrorCode = 500002;
 		} catch (Exception e) {
 			e.printStackTrace();

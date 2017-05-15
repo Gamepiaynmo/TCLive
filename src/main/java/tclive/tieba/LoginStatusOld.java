@@ -159,7 +159,7 @@ public class LoginStatusOld {
 			httpPost.setEntity(new UrlEncodedFormEntity(paramList, "utf-8"));
 			response = httpClient.execute(httpPost);
 			String responseString = EntityUtils.toString(response.getEntity());
-			param_codeString = Utils.patternMatch(responseString, "&codeString=(\\w+)&");
+			param_codeString = Utils.patternMatch(responseString, "&codeString=(\\w*)&");
 			lastErrorCode = Integer.parseInt(Utils.patternMatch(responseString, "err_no=(\\d+)"));
 			response.close();
 			checkSuccess();
@@ -255,7 +255,7 @@ public class LoginStatusOld {
 			httpPost.setEntity(new UrlEncodedFormEntity(paramList, "utf-8"));
 			response = httpClient.execute(httpPost);
 			String responseString = EntityUtils.toString(response.getEntity());
-			param_codeString = Utils.patternMatch(responseString, "&codeString=(\\w+)&");
+			param_codeString = Utils.patternMatch(responseString, "&codeString=(\\w*)&");
 			lastErrorCode = Integer.parseInt(Utils.patternMatch(responseString, "err_no=(\\d+)"));
 			response.close();
 			checkSuccess();

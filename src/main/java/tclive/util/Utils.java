@@ -26,7 +26,11 @@ import org.apache.http.util.EntityUtils;
 import com.google.common.collect.Lists;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.event.ClickEvent;
 import tclive.TCLiveMod;
 import tclive.gui.InputVerifyCode;
 
@@ -158,22 +162,41 @@ public class Utils {
 		switch (code) {
 		case 0: sendMessageTranslate("live.loginsucceed"); return;
 		case 257:
-			TCLiveMod.mod.loginStatus.loadVerifyCodePicture();
-			TCLiveMod.mc.displayGuiScreen(new InputVerifyCode(true));
-			return;
-		case 6:
-			TCLiveMod.mod.loginStatus.loadVerifyCodePicture();
-			TCLiveMod.mc.displayGuiScreen(new InputVerifyCode(false));
-			return;
 		case 500001:
 			TCLiveMod.mod.loginStatus.loadVerifyCodePicture();
 			TCLiveMod.mc.displayGuiScreen(new InputVerifyCode(true));
 			return;
+		case 6:
 		case 500002:
 			TCLiveMod.mod.loginStatus.loadVerifyCodePicture();
 			TCLiveMod.mc.displayGuiScreen(new InputVerifyCode(false));
 			return;
+		case 400101:
+		case 400023:
+		case 400032:
+		case 400034:
+		case 120016:
+		case 400024:
+			return;
 		default: sendMessageTranslate(getLoginFailReason(code)); return;
+		}
+	}
+	
+	public static boolean needSecurityVerify(int code) {
+		return code == 400101 || code == 400023 || code == 400032 || code == 400034 || code == 120016 || code == 400024;
+	}
+	
+	public static void handleSecurityVerify(String gotourl) {
+		String text = "[TCLive] " + I18n.format("live.failreason.needverify");
+		try {
+			ITextComponent link = new TextComponentString(gotourl);
+            ClickEvent click = new ClickEvent(ClickEvent.Action.OPEN_URL, gotourl);
+            link.getStyle().setClickEvent(click);
+            link.getStyle().setUnderlined(true);
+            link.getStyle().setColor(TextFormatting.BLUE);
+			TCLiveMod.mc.player.sendMessage(new TextComponentString(text).appendSibling(link));
+		} catch (Exception e) {
+			TCLiveMod.LOG.info(text);
 		}
 	}
 	
