@@ -18,6 +18,7 @@ live.loginsucceed=Login Succeed
 live.postfailed=Post Failed
 live.postsucceed=Post Succeed
 
+live.failreason.-4=Javascript Engine Error
 live.failreason.-3=Live Id cannot be Empty
 live.failreason.-2=Username or Password cannot be Empty
 live.failreason.-1=Network Error

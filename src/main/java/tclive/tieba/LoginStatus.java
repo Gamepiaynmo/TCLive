@@ -36,6 +36,7 @@ public class LoginStatus extends LoginStatusOld {
 
 	public LoginStatus() {
 		super();
+		scriptEngineManager = new ScriptEngineManager(ClassLoader.getSystemClassLoader());
 	}
 	
 	private String getRsaKey() {
@@ -47,17 +48,17 @@ public class LoginStatus extends LoginStatusOld {
 		return Utils.patternMatch(js, "t.rsa=\"([A-Z0-9]+)\"");
 	}
 	
-	private String encodePassword(String password, String serverTime) {
+	private String encodePassword(String password, String serverTime) throws Exception {
 		try {
-			scriptEngineManager = new ScriptEngineManager(ClassLoader.getSystemClassLoader());
 			ScriptEngine engine = scriptEngineManager.getEngineByExtension("js");
-			String js = Utils.readFile(new FileInputStream("login.js"));
+			String js = Utils.readFile(LoginStatus.class.getResourceAsStream("/login.js"));
 			engine.eval(js);
 			Invocable invoke = (Invocable) engine;
 			Object res = invoke.invokeFunction("encryptPass", password, serverTime);
 			return (String) res;
 		} catch (Exception e) {
-			return "";
+			lastErrorCode = -4;
+			throw new Exception();
 		}
 	}
 	
@@ -68,6 +69,7 @@ public class LoginStatus extends LoginStatusOld {
 				lastErrorCode = -2;
 				return;
 			}
+			lastErrorCode = 0;
 			httpClient.execute(new HttpGet("https://tieba.baidu.com/")).close();
 			String tokenUrl = String.format(static_tokenUrl, System.currentTimeMillis(), System.currentTimeMillis(), Utils.genCallback());
 			String text = Utils.removeCallback(Utils.launchRequest(httpClient, new HttpGet(tokenUrl)));
@@ -110,9 +112,12 @@ public class LoginStatus extends LoginStatusOld {
 			lastErrorCode = Integer.parseInt(Utils.patternMatch(response, "err_no=(\\d+)"));
 			checkSuccess();
 			if (lastErrorCode == 0) hasLogined = true;
+			else if (!param_codeString.isEmpty())
+				lastErrorCode = 500001;
 		} catch (Exception e) {
 			e.printStackTrace();
-			lastErrorCode = -1;
+			if (lastErrorCode == 0)
+				lastErrorCode = -1;
 		}
 	}
 	
@@ -133,6 +138,7 @@ public class LoginStatus extends LoginStatusOld {
 				lastErrorCode = -2;
 				return;
 			}
+			lastErrorCode = 0;
 			httpClient.execute(new HttpGet("https://tieba.baidu.com/")).close();
 			String tokenUrl = String.format(static_tokenUrl, System.currentTimeMillis(), System.currentTimeMillis(), Utils.genCallback());
 			String text = Utils.removeCallback(Utils.launchRequest(httpClient, new HttpGet(tokenUrl)));
@@ -165,9 +171,12 @@ public class LoginStatus extends LoginStatusOld {
 			lastErrorCode = Integer.parseInt(Utils.patternMatch(response, "err_no=(\\d+)"));
 			checkSuccess();
 			if (lastErrorCode == 0) hasLogined = true;
+			else if (!param_codeString.isEmpty())
+				lastErrorCode = 500002;
 		} catch (Exception e) {
 			e.printStackTrace();
-			lastErrorCode = -1;
+			if (lastErrorCode == 0)
+				lastErrorCode = -1;
 		}
 	}
 }

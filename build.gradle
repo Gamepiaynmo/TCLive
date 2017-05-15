@@ -57,8 +57,6 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    runtime files('libs/httpmime-4.3.3.jar')
-
 }
 
 processResources {
@@ -69,6 +67,7 @@ processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
+        include 'login.js'
                 
         // replace version and mcversion
         expand 'version':project.version, 'mcversion':project.minecraft.version

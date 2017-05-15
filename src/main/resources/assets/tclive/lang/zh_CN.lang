@@ -18,6 +18,7 @@ live.loginsucceed=登陆成功
 live.postfailed=发帖失败
 live.postsucceed=发帖成功
 
+live.failreason.-4=Javascript脚本错误
 live.failreason.-3=帖子ID为空
 live.failreason.-2=用户名或密码为空
 live.failreason.-1=网络错误
