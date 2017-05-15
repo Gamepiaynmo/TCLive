@@ -19,6 +19,8 @@ Baidu Tieba Live Mod for Minecraft
 
 ## Supported Versions
 
+- Minecraft 1.7.10
+- Minecraft 1.10.2
 - Minecraft 1.11.2
 
 ## Friendly Links
