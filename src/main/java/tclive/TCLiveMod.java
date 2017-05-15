@@ -132,9 +132,11 @@ public class TCLiveMod {
 	
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event) {
-		updateConfig(config);
-		if (!loginStatus.hasLogined())
-			tryLogin();
+		if (event.getWorld().isRemote) {
+			updateConfig(config);
+			if (!loginStatus.hasLogined())
+				tryLogin();
+		}
 	}
 	
 	private void tryLogin() {
